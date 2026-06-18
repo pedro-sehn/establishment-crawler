@@ -1,0 +1,18 @@
+[project]
+name = "establishment-crawler-backend"
+version = "0.1.0"
+description = "Instagram reel crawler + reshaper backend (FastAPI + instaloader + ffmpeg)"
+requires-python = ">=3.14"
+dependencies = [
+    # Floors that ship prebuilt wheels for Python 3.14.
+    # (Older pydantic-core releases have no cp314 wheel and need a Rust toolchain.)
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "httpx>=0.28",
+    "pydantic>=2.11",
+    "pydantic-settings>=2.8",
+]
+
+[tool.uv]
+# App, not a library — don't try to build/install this project itself.
+package = false
