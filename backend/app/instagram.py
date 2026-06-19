@@ -53,6 +53,7 @@ class ReelData:
     thumbnail_url: str
     view_count: int
     caption: str
+    video_url: str = ""
 
 
 @dataclass
@@ -61,6 +62,16 @@ class ProfileData:
     full_name: str
     profile_pic_url: str
     biography: str
+    external_url: str = ""
+
+
+@dataclass
+class IgCredentials:
+    """Instagram session cookies supplied per request (from the frontend)."""
+
+    sessionid: str = ""
+    csrftoken: str = ""
+    ds_user_id: str = ""
 
 
 def _shortcode_to_mediaid(code: str) -> int:
@@ -71,14 +82,14 @@ def _shortcode_to_mediaid(code: str) -> int:
 
 
 class InstagramClient:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Settings, credentials: IgCredentials) -> None:
         self._settings = settings
-        self._logged_in = bool(settings.ig_sessionid)
+        self._logged_in = bool(credentials.sessionid)
 
         cookies = {
-            "sessionid": settings.ig_sessionid or "",
-            "csrftoken": settings.ig_csrftoken or "",
-            "ds_user_id": settings.ig_ds_user_id or "",
+            "sessionid": credentials.sessionid,
+            "csrftoken": credentials.csrftoken,
+            "ds_user_id": credentials.ds_user_id,
         }
         headers = {
             "User-Agent": (
@@ -87,7 +98,7 @@ class InstagramClient:
             ),
             "X-IG-App-ID": IG_APP_ID,
             "X-Requested-With": "XMLHttpRequest",
-            "X-CSRFToken": settings.ig_csrftoken or "",
+            "X-CSRFToken": credentials.csrftoken,
             "Referer": "https://www.instagram.com/",
             "Accept": "*/*",
         }
@@ -99,12 +110,21 @@ class InstagramClient:
         )
         if not self._logged_in:
             logger.warning(
-                "No CRAWLER_IG_SESSIONID set; Instagram blocks most anonymous "
-                "requests. Add your session cookie (see README)."
+                "No sessionid supplied; Instagram blocks most anonymous requests. "
+                "Paste your session cookies in the frontend (see README)."
             )
 
     def _is_logged_in(self) -> bool:
         return self._logged_in
+
+    def close(self) -> None:
+        self._http.close()
+
+    def __enter__(self) -> "InstagramClient":
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        self.close()
 
     # -- URL parsing ------------------------------------------------------
 
@@ -163,6 +183,7 @@ class InstagramClient:
             full_name=user.get("full_name") or "",
             profile_pic_url=user.get("profile_pic_url_hd") or user.get("profile_pic_url") or "",
             biography=user.get("biography") or "",
+            external_url=_external_url(user),
         )
 
         if user.get("is_private") and not user.get("followed_by_viewer"):
@@ -200,6 +221,7 @@ class InstagramClient:
                     thumbnail_url=_thumb(it),
                     view_count=int(views),
                     caption=((it.get("caption") or {}).get("text") or "")[:200],
+                    video_url=_video_url(it),
                 )
             )
         reels.sort(key=lambda r: r.view_count, reverse=True)
@@ -278,11 +300,11 @@ class InstagramClient:
         if self._logged_in:
             return (
                 "Instagram rejected the request — your session cookie may be expired. "
-                "Refresh CRAWLER_IG_SESSIONID from a logged-in instagram.com session."
+                "Paste fresh cookies from a logged-in instagram.com session."
             )
         return (
-            "Instagram requires login. Set CRAWLER_IG_SESSIONID (and CRAWLER_IG_CSRFTOKEN) "
-            "from your browser cookies — see README."
+            "Instagram requires login. Paste your sessionid (and csrftoken) cookies "
+            "in the form above — see README."
         )
 
 
@@ -297,12 +319,41 @@ def _thumb(item: dict) -> str:
     return ""
 
 
-_client: InstagramClient | None = None
+def _video_url(item: dict) -> str:
+    """Best available playable URL from a feed item (for inline preview)."""
+    versions = item.get("video_versions") or []
+    if versions:
+        return versions[0].get("url", "")
+    carousel = item.get("carousel_media") or []
+    if carousel:
+        return _video_url(carousel[0])
+    return ""
 
 
-def get_client() -> InstagramClient:
-    """Lazily build a process-wide client."""
-    global _client
-    if _client is None:
-        _client = InstagramClient(get_settings())
-    return _client
+def _external_url(user: dict) -> str:
+    """The account's bio link, if any (external_url or first bio_links entry)."""
+    if user.get("external_url"):
+        return user["external_url"]
+    links = user.get("bio_links") or []
+    if links and isinstance(links, list):
+        return links[0].get("url", "")
+    return ""
+
+
+def build_client(credentials: IgCredentials | None = None) -> InstagramClient:
+    """Build a client for a single request.
+
+    Cookies come from the frontend (``credentials``); any missing value falls
+    back to the matching ``CRAWLER_IG_*`` env var so server-side config still
+    works for local/dev use.
+    """
+    settings = get_settings()
+    creds = credentials or IgCredentials()
+    return InstagramClient(
+        settings,
+        IgCredentials(
+            sessionid=creds.sessionid or settings.ig_sessionid or "",
+            csrftoken=creds.csrftoken or settings.ig_csrftoken or "",
+            ds_user_id=creds.ds_user_id or settings.ig_ds_user_id or "",
+        ),
+    )

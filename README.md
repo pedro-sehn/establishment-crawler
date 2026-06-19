@@ -1,8 +1,10 @@
 # establishment-crawler
 
-Paste an Instagram **profile URL** → get the account's **username, profile picture, and
-bio**, plus its **three most-viewed reels**. Pick the reel you like, reshape it to a wide
-aspect ratio (**16:9** or **4:3**), and **download** the result.
+Paste an Instagram **profile URL** → get the account's **username, profile picture, bio, and
+bio link**, an auto-extracted **color palette** from the logo (hover a swatch for its hex,
+click to copy), plus its **three most-viewed reels** (preview each one playing inline). Pick
+the reel you like, reshape it to **16:9**, and **download** the result. The logo also has its
+own download button.
 
 ```
 URL ─▶ FastAPI backend (Instagram web API + your cookies) ─▶ top 3 reels
@@ -16,7 +18,7 @@ URL ─▶ FastAPI backend (Instagram web API + your cookies) ─▶ top 3 reels
 - **Backend:** Python + FastAPI. Talks to **Instagram's own web API** (the endpoints the
   website calls — `users/web_profile_info`, `feed/user/{id}`, `media/{id}/info`) using your
   browser **session cookies**. `ffmpeg`/`ffprobe` for video reshaping.
-- **Frontend:** React + TypeScript (Vite).
+- **Frontend:** React + TypeScript (Vite) + Tailwind CSS v4.
 
 ## Prerequisites
 
@@ -81,11 +83,19 @@ Put these in `backend/.env` (gitignored). Prefix `CRAWLER_`:
 ### Authentication (required)
 
 Instagram blocks almost all anonymous traffic, so the app authenticates with **your browser
-session cookies**. Get them while logged in to instagram.com:
+session cookies**. You paste them **in the frontend** — they're saved in your browser's own
+cookies (never the server) and sent with each request.
 
 1. Open instagram.com (logged in) → DevTools → **Application ▸ Cookies ▸ instagram.com**.
-2. Copy the values of `sessionid`, `csrftoken`, and `ds_user_id`.
-3. Put them in `backend/.env`:
+2. Copy the values of `sessionid`, `csrftoken`, and `ds_user_id` (or the whole cookie string).
+3. Paste them into the **Instagram cookies** box at the top of the app → **Save cookies**.
+
+The cookies persist across reloads (90-day browser cookie) until you **Clear** them. The
+session lasts months; if requests start returning **401**, paste fresh cookies (logging out
+of Instagram in the browser invalidates `sessionid`).
+
+> **Server-side fallback (optional):** the `CRAWLER_IG_*` env vars below still work and fill
+> in any cookie the frontend omits — handy for local/dev use. The frontend values win.
 
 ```dotenv
 CRAWLER_IG_SESSIONID=<your sessionid>
@@ -93,17 +103,14 @@ CRAWLER_IG_CSRFTOKEN=<your csrftoken>
 CRAWLER_IG_DS_USER_ID=<your ds_user_id>
 ```
 
-On startup the backend logs `Logged in via cookies as @<you>`. The session lasts months;
-if requests start returning **401**, refresh `sessionid` (logging out of Instagram in the
-browser invalidates it). **Keep `.env` secret — never commit it.**
-
 ## API
 
 | Method | Path | Body / Params | Returns |
 | --- | --- | --- | --- |
-| `POST` | `/api/profile` | `{ "url": "…" }` | profile + top reels (image URLs proxied) |
+| `POST` | `/api/profile` | `{ "url", ig_sessionid?, ig_csrftoken?, ig_ds_user_id? }` | profile (incl. bio link) + top reels (image + video URLs proxied) |
 | `GET` | `/api/proxy-image` | `?src=<IG CDN url>` | streams the image (CORS/hotlink workaround) |
-| `POST` | `/api/process` | `{ "shortcode"\|"url", "ratio", "fit" }` | `{ job_id, width, height }` |
+| `GET` | `/api/proxy-video` | `?src=<IG CDN url>` | streams the reel video with Range support (inline preview) |
+| `POST` | `/api/process` | `{ "shortcode"\|"url", "ratio", "fit", ig_sessionid?, … }` | `{ job_id, width, height }` |
 | `GET` | `/api/download/{job_id}` | — | the reshaped `.mp4` as an attachment |
 
 - `ratio`: `"16:9"` (1920×1080) or `"4:3"` (1440×1080)

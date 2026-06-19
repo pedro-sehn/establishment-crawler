@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Reel } from "../types";
 
 interface Props {
@@ -13,30 +14,72 @@ function formatViews(n: number): string {
 }
 
 export default function ReelPicker({ reels, selected, onSelect }: Props) {
+  // Which reel is currently previewing (playing inline).
+  const [playing, setPlaying] = useState<string | null>(null);
+
   if (reels.length === 0) {
-    return <p className="empty">No reels found on this account.</p>;
+    return <p className="text-muted">Nenhum reel encontrado nesta conta.</p>;
   }
+
   return (
-    <section>
-      <h3>Top {reels.length} most-viewed reels — pick your favorite</h3>
-      <div className="reel-grid">
+    <section className="mt-2">
+      <h3 className="text-base font-semibold">
+        Top {reels.length} reels mais vistos — escolha o seu favorito
+      </h3>
+      <div className="mt-3 grid grid-cols-3 gap-3">
         {reels.map((reel) => {
           const isSelected = reel.shortcode === selected;
+          const isPlaying = playing === reel.shortcode;
           return (
-            <button
+            <div
               key={reel.shortcode}
-              className={`reel-card${isSelected ? " selected" : ""}`}
-              onClick={() => onSelect(reel.shortcode)}
-              type="button"
+              className={`relative aspect-[9/16] overflow-hidden rounded-xl border-2 bg-panel transition-colors ${
+                isSelected ? "border-accent shadow-[0_0_0_2px_var(--color-accent)]" : "border-border"
+              }`}
             >
-              <img
-                src={reel.thumbnail_url}
-                alt={reel.caption || reel.shortcode}
-                referrerPolicy="no-referrer"
-              />
-              <span className="views">▶ {formatViews(reel.view_count)} views</span>
-              {isSelected && <span className="check">✓</span>}
-            </button>
+              {isPlaying && reel.video_url ? (
+                <video
+                  src={reel.video_url}
+                  className="h-full w-full object-cover"
+                  controls
+                  autoPlay
+                  playsInline
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onSelect(reel.shortcode)}
+                  className="h-full w-full"
+                >
+                  <img
+                    src={reel.thumbnail_url}
+                    alt={reel.caption || reel.shortcode}
+                    referrerPolicy="no-referrer"
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+              )}
+
+              <span className="pointer-events-none absolute bottom-2 left-2 rounded bg-black/65 px-1.5 py-0.5 text-xs text-white">
+                ▶ {formatViews(reel.view_count)} visualizações
+              </span>
+
+              {isSelected && !isPlaying && (
+                <span className="pointer-events-none absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-accent font-bold text-white">
+                  ✓
+                </span>
+              )}
+
+              {reel.video_url && (
+                <button
+                  type="button"
+                  onClick={() => setPlaying(isPlaying ? null : reel.shortcode)}
+                  className="absolute left-2 top-2 rounded-md bg-black/65 px-2 py-1 text-xs font-semibold text-white transition-colors hover:bg-accent"
+                >
+                  {isPlaying ? "✕ Fechar" : "▶ Prévia"}
+                </button>
+              )}
+            </div>
           );
         })}
       </div>

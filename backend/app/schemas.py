@@ -5,7 +5,15 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
-class ProfileRequest(BaseModel):
+class IgCookieFields(BaseModel):
+    """Instagram session cookies pasted by the user in the frontend."""
+
+    ig_sessionid: str | None = Field(None, description="Your instagram.com `sessionid` cookie.")
+    ig_csrftoken: str | None = Field(None, description="Your instagram.com `csrftoken` cookie.")
+    ig_ds_user_id: str | None = Field(None, description="Your instagram.com `ds_user_id` cookie.")
+
+
+class ProfileRequest(IgCookieFields):
     url: str = Field(..., description="Instagram profile, reel, or post URL.")
 
 
@@ -14,6 +22,7 @@ class ReelOut(BaseModel):
     thumbnail_url: str  # points at our /api/proxy-image
     view_count: int
     caption: str = ""
+    video_url: str = ""  # points at our /api/proxy-video (for inline preview)
 
 
 class ProfileOut(BaseModel):
@@ -21,6 +30,7 @@ class ProfileOut(BaseModel):
     full_name: str
     profile_pic_url: str  # points at our /api/proxy-image
     biography: str
+    external_url: str = ""  # the account's bio link
 
 
 class ProfileResponse(BaseModel):
@@ -28,7 +38,7 @@ class ProfileResponse(BaseModel):
     top_reels: list[ReelOut]
 
 
-class ProcessRequest(BaseModel):
+class ProcessRequest(IgCookieFields):
     shortcode: str | None = Field(None, description="Shortcode of a chosen featured reel.")
     url: str | None = Field(
         None,
