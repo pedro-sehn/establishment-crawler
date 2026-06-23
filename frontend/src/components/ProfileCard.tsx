@@ -23,10 +23,14 @@ export default function ProfileCard({ profile }: { profile: Profile }) {
       <div className="min-w-0 flex-1">
         <h2 className="m-0 text-xl font-bold">@{profile.username}</h2>
         {profile.full_name && (
-          <p className="mt-0.5 mb-0 font-semibold text-text">{profile.full_name}</p>
+          <p className="mt-0.5 mb-0 font-semibold text-text">
+            {profile.full_name}
+          </p>
         )}
         {profile.biography && (
-          <p className="mt-1 mb-0 whitespace-pre-wrap text-muted">{profile.biography}</p>
+          <p className="mt-1 mb-0 whitespace-pre-wrap text-muted">
+            {profile.biography}
+          </p>
         )}
         {profile.external_url && (
           <a

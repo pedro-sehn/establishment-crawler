@@ -5,7 +5,12 @@ interface Props {
   onChange: (v: string) => void;
 }
 
-export default function CustomReelInput({ value, active, disabled, onChange }: Props) {
+export default function CustomReelInput({
+  value,
+  active,
+  disabled,
+  onChange,
+}: Props) {
   return (
     <section
       className={`mt-6 rounded-xl border bg-panel p-4 ${

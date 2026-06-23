@@ -36,7 +36,7 @@ From the repo root:
 ```bash
 npm install        # installs root dev runner (concurrently)
 npm run setup      # backend: uv sync   +   frontend: npm install
-npm run dev        # runs backend (:8000) and frontend (:5173) together
+npm run dev        # runs backend (:8080) and frontend (:5173) together
 ```
 
 Open `http://localhost:5173`. The Vite dev server proxies `/api/*` to the backend, so the
@@ -57,7 +57,7 @@ Root scripts (`package.json`):
 # Backend
 cd backend
 uv sync                                       # creates .venv + uv.lock from pyproject.toml
-uv run uvicorn app.main:app --reload --port 8000   # /health for a quick check
+uv run uvicorn app.main:app --reload --port 8080   # /health for a quick check
 
 # Frontend
 cd frontend

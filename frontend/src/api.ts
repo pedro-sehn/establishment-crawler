@@ -1,4 +1,10 @@
-import type { Fit, IgCookies, ProcessResponse, ProfileResponse, Ratio } from "./types";
+import type {
+  Fit,
+  IgCookies,
+  ProcessResponse,
+  ProfileResponse,
+  Ratio,
+} from "./types";
 
 // Map the pasted cookies onto the request body fields the backend expects.
 // Empty values are dropped so the backend can fall back to its env config.
@@ -24,7 +30,10 @@ async function asJson<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export function fetchProfile(url: string, cookies: IgCookies): Promise<ProfileResponse> {
+export function fetchProfile(
+  url: string,
+  cookies: IgCookies,
+): Promise<ProfileResponse> {
   return fetch("/api/profile", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

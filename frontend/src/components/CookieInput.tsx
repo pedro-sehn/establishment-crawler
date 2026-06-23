@@ -27,15 +27,19 @@ export default function CookieInput({ cookies, onSave }: Props) {
         saved ? "border-solid border-accent" : "border-dashed border-border"
       }`}
     >
-      <label htmlFor="ig-cookies" className="mb-1.5 block text-sm font-semibold">
+      <label
+        htmlFor="ig-cookies"
+        className="mb-1.5 block text-sm font-semibold"
+      >
         Cookies do Instagram
       </label>
       <p className="mb-2.5 text-[0.82rem] text-muted">
-        Abra o instagram.com (logado) → DevTools → Application ▸ Cookies, depois cole seus{" "}
-        <code className="text-[0.8rem] text-accent-2">sessionid</code>,{" "}
-        <code className="text-[0.8rem] text-accent-2">csrftoken</code> e{" "}
-        <code className="text-[0.8rem] text-accent-2">ds_user_id</code> aqui (uma string de
-        cookie completa também funciona). Salvos apenas no seu navegador.
+        Abra o instagram.com (logado) → DevTools → Application ▸ Cookies, depois
+        cole seus <code className="text-[0.8rem] text-accent-2">sessionid</code>
+        , <code className="text-[0.8rem] text-accent-2">csrftoken</code> e{" "}
+        <code className="text-[0.8rem] text-accent-2">ds_user_id</code> aqui
+        (uma string de cookie completa também funciona). Salvos apenas no seu
+        navegador.
       </p>
       <textarea
         id="ig-cookies"

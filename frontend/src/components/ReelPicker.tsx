@@ -34,7 +34,9 @@ export default function ReelPicker({ reels, selected, onSelect }: Props) {
             <div
               key={reel.shortcode}
               className={`relative aspect-[9/16] overflow-hidden rounded-xl border-2 bg-panel transition-colors ${
-                isSelected ? "border-accent shadow-[0_0_0_2px_var(--color-accent)]" : "border-border"
+                isSelected
+                  ? "border-accent shadow-[0_0_0_2px_var(--color-accent)]"
+                  : "border-border"
               }`}
             >
               {isPlaying && reel.video_url ? (

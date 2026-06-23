@@ -19,7 +19,9 @@ function readJar(): Record<string, string> {
   for (const part of document.cookie.split(";")) {
     const eq = part.indexOf("=");
     if (eq === -1) continue;
-    jar[part.slice(0, eq).trim()] = decodeURIComponent(part.slice(eq + 1).trim());
+    jar[part.slice(0, eq).trim()] = decodeURIComponent(
+      part.slice(eq + 1).trim(),
+    );
   }
   return jar;
 }

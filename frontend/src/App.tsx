@@ -9,7 +9,13 @@ import ProfileCard from "./components/ProfileCard";
 import ReelPicker from "./components/ReelPicker";
 import UrlForm from "./components/UrlForm";
 import VideoUpload from "./components/VideoUpload";
-import type { Fit, IgCookies, ProcessResponse, ProfileResponse, Ratio } from "./types";
+import type {
+  Fit,
+  IgCookies,
+  ProcessResponse,
+  ProfileResponse,
+  Ratio,
+} from "./types";
 
 // Output ratio is fixed at 16:9 per product spec.
 const RATIO: Ratio = "16:9";
@@ -99,13 +105,14 @@ export default function App() {
   }
 
   return (
-    <div className="mx-auto max-w-[880px] px-5 pt-8 pb-16">
+    <div className="mx-auto max-w-220 px-5 pt-8 pb-16">
       <header>
-        <h1 className="m-0 bg-gradient-to-r from-accent to-accent-2 bg-clip-text text-3xl font-bold text-transparent">
+        <h1 className="m-0 bg-linear-to-r from-accent to-accent-2 bg-clip-text text-3xl font-bold text-transparent">
           Establishment Crawler
         </h1>
         <p className="mt-1 text-muted">
-          Cole um perfil do Instagram → escolha um reel em destaque → ajuste e baixe.
+          Cole um perfil do Instagram → escolha um reel em destaque → ajuste e
+          baixe.
         </p>
       </header>
 
@@ -137,7 +144,11 @@ export default function App() {
         </>
       )}
 
-      <VideoUpload file={uploadFile} disabled={processing} onChange={handleUploadChange} />
+      <VideoUpload
+        file={uploadFile}
+        disabled={processing}
+        onChange={handleUploadChange}
+      />
 
       {canProcess && (
         <>
@@ -158,8 +169,8 @@ export default function App() {
 
       <footer className="mt-12 border-t border-border pt-4 text-muted">
         <small>
-          For personal use. Scraping/redistributing content may violate Instagram's Terms of
-          Service and copyright.
+          For personal use. Scraping/redistributing content may violate
+          Instagram's Terms of Service and copyright.
         </small>
       </footer>
     </div>

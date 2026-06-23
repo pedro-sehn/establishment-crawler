@@ -6,8 +6,16 @@ interface Props {
 }
 
 const FITS: { value: Fit; label: string; hint: string }[] = [
-  { value: "pad", label: "Fundo desfocado", hint: "Mantém o vídeo inteiro, preenche as bordas com desfoque" },
-  { value: "crop", label: "Corte central", hint: "Preenche o quadro, corta topo/base" },
+  {
+    value: "pad",
+    label: "Fundo desfocado",
+    hint: "Mantém o vídeo inteiro, preenche as bordas com desfoque",
+  },
+  {
+    value: "crop",
+    label: "Corte central",
+    hint: "Preenche o quadro, corta topo/base",
+  },
 ];
 
 export default function OutputControls({ fit, onFit }: Props) {
@@ -29,7 +37,9 @@ export default function OutputControls({ fit, onFit }: Props) {
               title={f.hint}
               onClick={() => onFit(f.value)}
               className={`px-3.5 py-2 text-sm transition-colors ${
-                fit === f.value ? "bg-accent text-white" : "bg-panel text-text hover:bg-panel-2"
+                fit === f.value
+                  ? "bg-accent text-white"
+                  : "bg-panel text-text hover:bg-panel-2"
               }`}
             >
               {f.label}

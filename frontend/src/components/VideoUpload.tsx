@@ -8,7 +8,9 @@ interface Props {
 
 function prettySize(bytes: number): string {
   const mb = bytes / (1024 * 1024);
-  return mb >= 1 ? `${mb.toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return mb >= 1
+    ? `${mb.toFixed(1)} MB`
+    : `${Math.max(1, Math.round(bytes / 1024))} KB`;
 }
 
 export default function VideoUpload({ file, disabled, onChange }: Props) {
@@ -67,7 +69,8 @@ export default function VideoUpload({ file, disabled, onChange }: Props) {
 
       {active && (
         <p className="mt-2 mb-0 text-[0.82rem] text-accent-2">
-          Usando o arquivo enviado — isso substitui qualquer reel ou URL selecionado acima.
+          Usando o arquivo enviado — isso substitui qualquer reel ou URL
+          selecionado acima.
         </p>
       )}
     </section>
