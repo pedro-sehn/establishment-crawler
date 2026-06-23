@@ -65,20 +65,19 @@ npm install
 npm run dev
 ```
 
-## Configuration (optional env vars)
+## Configuration
 
-All optional; prefix `CRAWLER_`:
+No environment variables or `.env` file. Settings live in code — edit
+`backend/app/config.py`:
 
-Put these in `backend/.env` (gitignored). Prefix `CRAWLER_`:
-
-| Variable | Default | Purpose |
+| Setting | Default | Purpose |
 | --- | --- | --- |
-| `CRAWLER_IG_SESSIONID` | — | **Required for real crawls.** Your `sessionid` cookie from a logged-in instagram.com. |
-| `CRAWLER_IG_CSRFTOKEN` | — | Your `csrftoken` cookie (recommended). |
-| `CRAWLER_IG_DS_USER_ID` | — | Your `ds_user_id` cookie (recommended). |
-| `CRAWLER_SCAN_CAP` | `30` | How many recent posts to scan when ranking reels by views. |
-| `CRAWLER_TOP_REELS` | `3` | Number of top reels to return. |
-| `CRAWLER_FRONTEND_ORIGIN` | `http://localhost:5173` | Allowed CORS origin. |
+| `scan_cap` | `30` | How many recent posts to scan when ranking reels by views. |
+| `top_reels` | `3` | Number of top reels to return. |
+| `frontend_origin` | `http://localhost:5173` | Allowed CORS origin. |
+
+Instagram credentials are **not** configured server-side — they're supplied per
+request by the frontend (see below).
 
 ### Authentication (required)
 
@@ -93,15 +92,6 @@ cookies (never the server) and sent with each request.
 The cookies persist across reloads (90-day browser cookie) until you **Clear** them. The
 session lasts months; if requests start returning **401**, paste fresh cookies (logging out
 of Instagram in the browser invalidates `sessionid`).
-
-> **Server-side fallback (optional):** the `CRAWLER_IG_*` env vars below still work and fill
-> in any cookie the frontend omits — handy for local/dev use. The frontend values win.
-
-```dotenv
-CRAWLER_IG_SESSIONID=<your sessionid>
-CRAWLER_IG_CSRFTOKEN=<your csrftoken>
-CRAWLER_IG_DS_USER_ID=<your ds_user_id>
-```
 
 ## API
 

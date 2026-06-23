@@ -343,17 +343,9 @@ def _external_url(user: dict) -> str:
 def build_client(credentials: IgCredentials | None = None) -> InstagramClient:
     """Build a client for a single request.
 
-    Cookies come from the frontend (``credentials``); any missing value falls
-    back to the matching ``CRAWLER_IG_*`` env var so server-side config still
-    works for local/dev use.
+    Cookies come from the frontend (``credentials``); there is no server-side
+    credential config.
     """
     settings = get_settings()
     creds = credentials or IgCredentials()
-    return InstagramClient(
-        settings,
-        IgCredentials(
-            sessionid=creds.sessionid or settings.ig_sessionid or "",
-            csrftoken=creds.csrftoken or settings.ig_csrftoken or "",
-            ds_user_id=creds.ds_user_id or settings.ig_ds_user_id or "",
-        ),
-    )
+    return InstagramClient(settings, creds)

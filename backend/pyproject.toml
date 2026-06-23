@@ -10,7 +10,6 @@ dependencies = [
     "uvicorn[standard]>=0.34",
     "httpx>=0.28",
     "pydantic>=2.11",
-    "pydantic-settings>=2.8",
     # Required by FastAPI to parse multipart/form-data (video uploads).
     "python-multipart>=0.0.9",
 ]
