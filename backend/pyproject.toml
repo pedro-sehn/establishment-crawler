@@ -13,6 +13,7 @@ dependencies = [
     "pydantic-settings>=2.8",
     # Required by FastAPI to parse multipart/form-data (video uploads).
     "python-multipart>=0.0.9",
+    "gunicorn>=26.0.0",
 ]
 
 [tool.uv]
